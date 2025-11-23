@@ -1,0 +1,36 @@
+name: Motivational Bot
+
+on:
+  schedule:
+    - cron: '0 9 * * *' # اجرا هر روز ساعت ۹ صبح
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  inspire-me:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Get Quote and Update File
+        run: |
+          # دریافت جمله انگیزشی از اینترنت
+          QUOTE=$(curl -s https://api.quotable.io/random | jq -r '"\"" + .content + "\" - " + .author')
+          
+          # اضافه کردن تاریخ و جمله به فایل
+          echo "---" >> motivation.md
+          echo "### $(date +'%Y-%m-%d')" >> motivation.md
+          echo "$QUOTE" >> motivation.md
+          
+      - name: Commit and Push
+        run: |
+          git config user.name "My Activity Bot"
+          # --- نکته مهم: ایمیل خودتان را در خط زیر بنویسید ---
+          git config user.email "vihaansharma1367@gmail.com"
+          
+          git add motivation.md
+          git commit -m "💡 Daily Inspiration: Updated by Bot"
+          git push
